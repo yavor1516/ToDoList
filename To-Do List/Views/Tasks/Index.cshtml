@@ -13,15 +13,9 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsCompleted)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.Title)</th>
+            <th>@Html.DisplayNameFor(model => model.Description)</th>
+            <th>@Html.DisplayNameFor(model => model.IsCompleted)</th>
             <th></th>
         </tr>
     </thead>
@@ -29,14 +23,10 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.Description)</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsCompleted)
+                    <input type="checkbox" class="is-completed-checkbox" data-id="@item.Id" @(item.IsCompleted ? "checked" : "") />
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -46,3 +36,34 @@
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.is-completed-checkbox').change(function() {
+                var taskId = $(this).data('id');
+                var isCompleted = $(this).is(':checked');
+
+                $.ajax({
+                    url: '@Url.Action("UpdateIsCompleted")',
+                    type: 'POST',
+                    data: {
+                        id: taskId,
+                        isCompleted: isCompleted
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            console.log('Task updated successfully');
+                        } else {
+                            console.log('Failed to update task');
+                        }
+                    },
+                    error: function() {
+                        console.log('Error updating task');
+                    }
+                });
+            });
+        });
+    </script>
+}

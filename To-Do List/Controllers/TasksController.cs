@@ -124,4 +124,19 @@ public class TasksController : Controller
     {
         return _context.Tasks.Any(e => e.Id == id);
     }
+
+    [HttpPost]
+    public IActionResult UpdateIsCompleted(int id, bool isCompleted)
+    {
+        var task = _context.Tasks.Find(id);
+        if (task == null)
+        {
+            return Json(new { success = false });
+        }
+
+        task.IsCompleted = isCompleted;
+        _context.SaveChanges();
+
+        return Json(new { success = true });
+    }
 }
