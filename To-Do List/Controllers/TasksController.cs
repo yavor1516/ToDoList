@@ -5,13 +5,16 @@ using To_Do_List.Models;
 using System.Linq;
 using To_Do_List;
 using Task = To_Do_List.Models.Task;
+using To_Do_List.Service;
 
 public class TasksController : Controller
 {
     private readonly TaskContext _context;
+    private readonly EmailService _emailService;
 
-    public TasksController(TaskContext context)
+    public TasksController(TaskContext context , EmailService emailService)
     {
+        _emailService = emailService;
         _context = context;
     }
 
@@ -31,7 +34,7 @@ public class TasksController : Controller
     // POST: Tasks/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create([Bind("Id,Title,Description,IsCompleted")] Task task)
+    public IActionResult Create([Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category")] Task task)
     {
         if (ModelState.IsValid)
         {
@@ -61,7 +64,7 @@ public class TasksController : Controller
     // POST: Tasks/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, [Bind("Id,Title,Description,IsCompleted")] Task task)
+    public IActionResult Edit(int id, [Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category")] Task task)
     {
         if (id != task.Id)
         {
@@ -136,7 +139,11 @@ public class TasksController : Controller
 
         task.IsCompleted = isCompleted;
         _context.SaveChanges();
-
+        if (isCompleted)
+        {
+            // Replace with the recipient's email address
+            _emailService.SendEmail("manev.yavor@gmail.com", $"Task Completed: {task.Title}", $"The task '{task.Title}' has been marked as completed. Good JOB!");
+        }
         return Json(new { success = true });
     }
 }
