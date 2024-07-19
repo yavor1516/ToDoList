@@ -34,7 +34,7 @@ public class TasksController : Controller
     // POST: Tasks/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Create([Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category,Progress")] Task task)
+    public IActionResult Create([Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category,Progress,ReminderTime")] Task task)
     {
         if (ModelState.IsValid)
         {
@@ -64,7 +64,7 @@ public class TasksController : Controller
     // POST: Tasks/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, [Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category,Progress")] Task task)
+    public IActionResult Edit(int id, [Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category,Progress,ReminderTime")] Task task)
     {
         if (id != task.Id)
         {
@@ -136,6 +136,7 @@ public class TasksController : Controller
         {
             return Json(new { success = false });
         }
+
 
         task.IsCompleted = isCompleted;
         _context.SaveChanges();

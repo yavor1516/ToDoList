@@ -9,11 +9,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<TaskContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register EmailService as a singleton
+//Services
 builder.Services.AddSingleton<EmailService>();
-
-// Register DailyTaskReminder as a hosted service
 builder.Services.AddHostedService<DailyTaskReminder>();
+builder.Services.AddHostedService<ReminderService>();
 
 var app = builder.Build();
 

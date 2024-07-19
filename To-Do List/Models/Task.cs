@@ -22,5 +22,6 @@ namespace To_Do_List.Models
 
         [Required]
         public string Progress { get; set; } // Not Started, In Progress, Completed
+        public DateTime? ReminderTime { get; set; } // Reminder time
     }
 }
