@@ -19,5 +19,8 @@ namespace To_Do_List.Models
         public DateTime? DueDate { get; set; }
 
         public string Category { get; set; } // Work, Personal, etc.
+
+        [Required]
+        public string Progress { get; set; } // Not Started, In Progress, Completed
     }
 }

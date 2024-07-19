@@ -11,16 +11,18 @@
     <a asp-action="Create">Create New Task</a>
 </p>
 <div class="form-group">
-    <label for="categoryFilter">Filter by Category:</label>
-    <select id="categoryFilter" class="form-control">
+    <label for="search">Search:</label>
+    <input type="text" id="search" class="form-control" placeholder="Search by title or description" />
+</div>
+<div class="form-group">
+    <label for="priorityFilter">Filter by Priority:</label>
+    <select id="priorityFilter" class="form-control">
         <option value="">All</option>
-        <option value="Work">Work</option>
-        <option value="Personal">Personal</option>
-        <option value="Shopping">Shopping</option>
-        <option value="Others">Others</option>
+        <option value="Low">Low</option>
+        <option value="Medium">Medium</option>
+        <option value="High">High</option>
     </select>
 </div>
-
 <table class="table">
     <thead>
         <tr>
@@ -29,6 +31,7 @@
             <th>@Html.DisplayNameFor(model => model.Priority)</th>
             <th>@Html.DisplayNameFor(model => model.DueDate)</th>
             <th>@Html.DisplayNameFor(model => model.Category)</th>
+            <th>@Html.DisplayNameFor(model => model.Progress)</th>
             <th>@Html.DisplayNameFor(model => model.IsCompleted)</th>
             <th></th>
         </tr>
@@ -36,12 +39,13 @@
     <tbody id="taskList">
         @foreach (var item in Model)
         {
-            <tr class="@(item.DueDate.HasValue && item.DueDate.Value < DateTime.Now && !item.IsCompleted ? "table-danger" : "")">
+            <tr class="@(item.Priority == "High" ? "table-danger" : item.Priority == "Medium" ? "table-warning" : "table-success")">
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
                 <td>@Html.DisplayFor(modelItem => item.Description)</td>
                 <td>@Html.DisplayFor(modelItem => item.Priority)</td>
                 <td>@Html.DisplayFor(modelItem => item.DueDate)</td>
                 <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                <td>@Html.DisplayFor(modelItem => item.Progress)</td>
                 <td>
                     <input type="checkbox" class="is-completed-checkbox" data-id="@item.Id" @(item.IsCompleted ? "checked" : "") />
                 </td>
@@ -58,12 +62,25 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            $('#search').on('input', function () {
+                var searchText = $(this).val().toLowerCase();
+                $('#taskList tr').each(function () {
+                    var title = $(this).find('td:nth-child(1)').text().toLowerCase();
+                    var description = $(this).find('td:nth-child(2)').text().toLowerCase();
+                    if (title.includes(searchText) || description.includes(searchText)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+
             $('.is-completed-checkbox').change(function () {
                 var taskId = $(this).data('id');
                 var isCompleted = $(this).is(':checked');
 
                 $.ajax({
-                    url: '@Url.Action("UpdateIsCompleted")',
+                    url: '@Url.Action("UpdateIsCompleted", "Tasks")',
                     type: 'POST',
                     data: {
                         id: taskId,
@@ -83,11 +100,11 @@
                 });
             });
 
-            $('#categoryFilter').change(function () {
-                var selectedCategory = $(this).val().toLowerCase();
+            $('#priorityFilter').change(function () {
+                var selectedPriority = $(this).val().toLowerCase();
                 $('#taskList tr').each(function () {
-                    var category = $(this).find('td:nth-child(5)').text().toLowerCase();
-                    if (selectedCategory === "" || category === selectedCategory) {
+                    var priority = $(this).find('td:nth-child(3)').text().toLowerCase();
+                    if (selectedPriority === "" || priority === selectedPriority) {
                         $(this).show();
                     } else {
                         $(this).hide();
