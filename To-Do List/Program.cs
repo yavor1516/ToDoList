@@ -9,7 +9,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<TaskContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//Services
+// Add session services
+builder.Services.AddSession();
+
+// Add authentication services
+builder.Services.AddAuthentication("MyCookieAuth")
+    .AddCookie("MyCookieAuth", options =>
+    {
+        options.Cookie.Name = "MyCookieAuth";
+        options.LoginPath = "/User/Login";
+        options.AccessDeniedPath = "/User/AccessDenied";
+    });
+
+// Services
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddHostedService<DailyTaskReminder>();
 builder.Services.AddHostedService<ReminderService>();
@@ -29,6 +41,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession(); // Use session middleware
+app.UseAuthentication(); // Use authentication middleware
 app.UseAuthorization();
 
 app.MapControllerRoute(

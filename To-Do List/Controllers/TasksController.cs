@@ -6,7 +6,10 @@ using System.Linq;
 using To_Do_List;
 using Task = To_Do_List.Models.Task;
 using To_Do_List.Service;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
+[Authorize]
 public class TasksController : Controller
 {
     private readonly TaskContext _context;
@@ -36,14 +39,27 @@ public class TasksController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Create([Bind("Id,Title,Description,IsCompleted,Priority,DueDate,Category,Progress,ReminderTime")] Task task)
     {
-        if (ModelState.IsValid)
+        var userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
         {
+            return RedirectToAction("Login", "User");
+        }
+
+        // Retrieve the current user's email from the claims
+        var userEmail = User.FindFirstValue(ClaimTypes.Email);
+
+        if (userId != null)
+        {
+            task.UserId = userId.Value;
+            task.UserEmail = userEmail;
+
             _context.Add(task);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));
         }
         return View(task);
     }
+
 
     // GET: Tasks/Edit/5
     public IActionResult Edit(int? id)

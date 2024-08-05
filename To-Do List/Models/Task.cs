@@ -1,9 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace To_Do_List.Models
 {
     public class Task
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -13,15 +16,25 @@ namespace To_Do_List.Models
 
         public bool IsCompleted { get; set; }
 
-        public string Priority { get; set; } // Low, Medium, High
+        [Required]
+        public string Priority { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime? DueDate { get; set; }
 
-        public string Category { get; set; } // Work, Personal, etc.
+        [Required]
+        public string Category { get; set; }
+
+        [Required]
+        public string UserEmail { get; set; } // The email of the user who owns the task
 
         [Required]
         public string Progress { get; set; } // Not Started, In Progress, Completed
+
         public DateTime? ReminderTime { get; set; } // Reminder time
+
+        [ForeignKey("User")]
+        public int UserId { get; set; } // Foreign key to User table
+        public User User { get; set; }  // Navigation property
     }
 }
